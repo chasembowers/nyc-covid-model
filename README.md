@@ -16,7 +16,7 @@
 
 ## Testing Accuracy
 
-The number of confirmed and probable deaths are "predicted back" each of the last 7 days with complete data, with the model ignorant of the 7 days previous to each predicted day. As of April 28, the average prediction accuracy is 92.52%. No (hyper)parameters were tuned to these last 7 days, but some model choices were influenced by them, so accuracy in practice is expected to be lower.
+The number of confirmed and probable deaths are "predicted back" for each of the last 7 days with complete data, with the model ignorant of the 7 days previous to each predicted day. As of April 28, the average prediction accuracy is 92.52%. No (hyper)parameters were tuned to these last 7 days, but some model choices were influenced by them, so accuracy in practice is expected to be lower.
 
 ## The Model
 
