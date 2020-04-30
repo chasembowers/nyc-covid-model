@@ -198,7 +198,7 @@ def simulate(X, score='train', days_excluded=0, days_predicted=0, display=False)
         curr_ever_contagious = next_ever_contagious
 
     # Predict deaths using array of # with symptom onset
-    # and distribution of time between sympton onset and death.
+    # and distribution of time between symptom onset and death.
     for i in range(len(onset)):
         for onset_to_death in range(MAX_ONSET_TO_DEATH+1):
             if i+onset_to_death<len(pred_deaths):
