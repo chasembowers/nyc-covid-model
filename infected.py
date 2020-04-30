@@ -3,6 +3,8 @@ import numpy as np
 import math
 from scipy.stats import lognorm
 from scipy.optimize import fmin
+from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 
 # NYC COVID data
 try:
@@ -201,11 +203,23 @@ def simulate(X, score='train', days_excluded=0, days_predicted=0, display=False)
                 pred_deaths[i+onset_to_death] += died
 
     if display:
+        if days_excluded > 0: raise Exception('Display for days exluded not implemented')
         print('Estimated confirmed + probable deaths: ', int(pred_deaths[-1]))
         infected = sum(onset) / (1. - ASYMPTOMATIC_RATIO)
         print('Estimated ever infected: {} ({:.2f}%)'.format(int(infected), 100*float(infected)/TOTAL_POP))
         print('Estimated currently contagious: {} ({:.2f}%)'.format(int(contagious[-1]), 100*contagious[-1]/TOTAL_POP))
         print('Estimated maximum ever simultaneously contagious: {} ({:.2f}%)'.format(int(max(contagious)), 100*max(contagious)/TOTAL_POP))
+        fig, axs = plt.subplots(3)
+        fig.tight_layout(pad=3.0)
+        plt.xlabel('Day (last day is {})'.format((LAST_DAY + pd.DateOffset(days_predicted)).strftime('%Y-%m-%d')))
+        axs[0].bar(range(days_simulated), contagious)
+        axs[0].set_title('Contagious People')
+        axs[1].bar(range(days_simulated), onset)
+        axs[1].set_title('People with Symptom Onset')
+        axs[2].bar(range(days_simulated-days_predicted,days_simulated), pred_deaths[-days_predicted:])
+        axs[2].bar(range(days_simulated-days_predicted), np.hstack((np.zeros(DAYS_BEFORE_DEATHS),scored_deaths)))
+        axs[2].set_title('Probable and Confirmed Deaths')
+        plt.show()
 
     # Cost function for training is Sum of Squares.
     if score == 'train':
@@ -232,8 +246,8 @@ for i in range(14):
     params = fitted_parameters(days_excluded=i+8)
     scores = simulate(params, score='test', days_excluded=i, display=False,)
     death_scores.append(scores)
-print('Mean accuracy 8-days-out deaths prediction over last 7 known days: {:.2f}% \n'.format(100*np.mean(death_scores)))
+print('Mean accuracy 8-days-out deaths prediction over last 14 known days: {:.2f}% \n'.format(100*np.mean(death_scores)))
 print('Training on all of death data...\n')
 params = fitted_parameters(days_excluded=0)
 print('Prediction in NYC for {} :\n'.format((LAST_DAY + pd.DateOffset(8)).strftime('%Y-%m-%d')))
-simulate(params, score='test', days_excluded=0, days_predicted=7, display=True)
+simulate(params, score='test', days_excluded=0, days_predicted=8, display=True)
