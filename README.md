@@ -4,7 +4,7 @@
 
     Training/predicting on limited subsets of death data to estimate prediction accuracy...
 
-    Mean accuracy 8-days-out deaths prediction over last 7 known days: 85.12% 
+    Mean accuracy 8-days-out deaths prediction over last 14 known days: 85.12% 
 
     Training on all of death data...
 
