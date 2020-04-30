@@ -213,7 +213,7 @@ def simulate(X, score='train', days_excluded=0, days_predicted=0, display=False)
                 pred_deaths[i+onset_to_death] += died
 
     if display:
-        print('Estimated Confirmed + Probable Deaths: ', int(pred_deaths[-1]))
+        print('Estimated confirmed + probable deaths: ', int(pred_deaths[-1]))
         infected = sum(onset) / (1. - ASYMPTOMATIC_RATIO)
         print('Estimated ever infected: {} ({:.2f}%)'.format(int(infected), 100*float(infected)/TOTAL_POP))
         print('Estimated currently contagious: {} ({:.2f}%)'.format(int(contagious[-1]), 100*contagious[-1]/TOTAL_POP))
