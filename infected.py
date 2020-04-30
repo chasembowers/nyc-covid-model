@@ -55,11 +55,6 @@ ASYMPTOMATIC_RATIO = .18
 # this.
 DAYS_BEFORE_DEATHS = 45
 
-# days before companies start instituting work from home
-# Beginning of March was chosen by looking at Google Trends 'new york work from home'.
-# https://trends.google.com/trends/explore?geo=US&q=new%20york%20work%20from%20home
-DAYS_BEFORE_WFH = DAYS_BEFORE_DEATHS + DEATHS.index.get_loc('2020-03-11')+10
-
 DAYS_BEFORE_PAUSE = DAYS_BEFORE_DEATHS + DEATHS.index.get_loc('2020-03-23')
 
 # How long a person is contagious before/on/after symptom onset.
@@ -110,16 +105,13 @@ R_AFTER_PAUSE = .75
 # transmission because it seems much rarer.
 # https://www.who.int/docs/default-source/coronaviruse/situation-reports/20200402-sitrep-73-covid-19.pdf?sfvrsn=5ae25bc7_2
 #
-# This model assumes constant R before March 1, a linear decrease in R from
-# March 1 to March 22, and a new, constant R of .75 after March 22.
+# This model assumes a step-wise change in the infection rate on March 23.
 #
-# X - array of (initial_contagious_log, R_before_wfh, R_before_pause) passed by fmin
+# X - array of (initial_contagious_log, R_before_pause) passed by fmin
 # initial_contagious_log - Log of size of contagious population on day 1.
 #   Not intended for realism but for scaling the infection curve.
 #   Simulation will start with 1 day of contagiousness. Can be < 1.
-# R_before_wfh- infection rate before March 1
-# R_before_pause- infection rate on March 22.
-#   Infection rate changes linearly from March 1 to March 22.
+# R_before_pause- infection rate before March 23
 # score- if 'train', returns sum of squared errors of deaths predictions.
 #   if 'test', returns accuracy of the last deaths prediction.
 # days_excluded- exclude this many days from the end of the simulation.
@@ -127,11 +119,9 @@ R_AFTER_PAUSE = .75
 # days_predicted- add this many days to the end of the simulation.
 # display- print statistics
 def simulate(X, score='train', days_excluded=0, days_predicted=0, display=False):
-    initial_contagious_log, R_before_wfh, R_before_pause = X
+    initial_contagious_log, R_before_pause = X
 
-    if (R_before_wfh < 0 or
-        R_before_pause < 0 or
-        R_before_wfh < R_before_pause or
+    if (R_before_pause < 0 or
         R_before_pause < R_AFTER_PAUSE):
         return np.inf
     initial_contagious = math.exp(initial_contagious_log)
@@ -168,10 +158,8 @@ def simulate(X, score='train', days_excluded=0, days_predicted=0, display=False)
         # Calculate number of those infected on day i who will become contagious.
         # It is assumed that the infection rate is dampened proportionally to the fraction of NYC already infected.
         days_contagious = DAYS_CONTAGIOUS_BEFORE + DAYS_CONTAGIOUS_ON_AFTER
-        if i < DAYS_BEFORE_WFH: become_contagious = contagious[i] * R_before_wfh / days_contagious * not_infected
-        elif i < DAYS_BEFORE_PAUSE:
-            x_intercept = (i + 1 - DAYS_BEFORE_WFH)/(DAYS_BEFORE_PAUSE - DAYS_BEFORE_WFH)
-            become_contagious = contagious[i] * (R_before_wfh + x_intercept*(R_before_pause - R_before_wfh)) / days_contagious * not_infected
+        if i < DAYS_BEFORE_PAUSE:
+            become_contagious = contagious[i] * R_before_pause / days_contagious * not_infected
         else:
             become_contagious = contagious[i] * R_AFTER_PAUSE / days_contagious * not_infected
 
@@ -234,13 +222,13 @@ def simulate(X, score='train', days_excluded=0, days_predicted=0, display=False)
 
 # Fit the model, excluding the last 'days_excluded' days from the training set.
 def fitted_parameters(days_excluded):
-    return fmin(simulate, [3.27080831, 4.10536956, 0.73740359],
+    return fmin(simulate, [2.27080831, 2.5],
                 args=('train',days_excluded,0,False),
                 disp=False)
 
 print('Training/predicting on limited subsets of death data to estimate prediction accuracy...\n')
 death_scores = []
-for i in range(7):
+for i in range(14):
     params = fitted_parameters(days_excluded=i+8)
     scores = simulate(params, score='test', days_excluded=i, display=False,)
     death_scores.append(scores)
