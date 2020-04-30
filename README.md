@@ -10,11 +10,13 @@
 
     Prediction in NYC for 2020-04-28 :
 
-    Estimated confirmed + probable deaths:  213
-    Estimated ever infected: 3112295 (37.05%)
-    Estimated currently contagious: 33564 (0.40%)
+    Estimated confirmed + probable deaths:  191
+    Estimated ever infected: 3116535 (37.10%)
+    Estimated currently contagious: 29873 (0.36%)
     Estimated maximum ever simultaneously contagious: 1051559 (12.52%)
 
+
+![alt tag](https://github.com/chasembowers/nyc-covid-model/raw/master/nyc_covid.png)
 
 ## Testing Accuracy
 
