@@ -102,7 +102,7 @@ for day in range(MAX_ONSET_TO_DEATH+1):
 # NYC total population
 TOTAL_POP = 8.4E6
 
-# infection rate after the R_AFTER_PAUSE
+# infection rate after the PAUSE
 # From Governor Cuomo's daily briefings
 R_AFTER_PAUSE = .75
 
