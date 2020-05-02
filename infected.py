@@ -9,13 +9,14 @@ import matplotlib.pyplot as plt
 # NYC COVID data
 try:
     death_data = pd.read_csv(
-        'https://raw.githubusercontent.com/nychealth/coronavirus-data/master/probable-confirmed-dod.csv',
+        'https://raw.githubusercontent.com/nychealth/coronavirus-data/master/Deaths/probable-confirmed-dod.csv',
         index_col=0,
         parse_dates=True)
     death_data.index = pd.DatetimeIndex(death_data.index)
     death_data = death_data.reindex(pd.date_range(death_data.index[0], death_data.index[-1]), fill_value=0)
     death_data.to_pickle('./deaths_backup')
 except:
+    print("Couldn't fetch data. Using backup")
     death_data = pd.read_pickle('./deaths_backup')
 
 
